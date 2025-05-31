@@ -1,0 +1,6 @@
+@TeamPork.API.LiveCart_HostAddress = http://localhost:5058
+
+GET {{TeamPork.API.LiveCart_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

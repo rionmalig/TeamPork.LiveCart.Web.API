@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamPork.API.LiveCart", "TeamPork.API.LiveCart\TeamPork.API.LiveCart.csproj", "{14DAA416-21F3-4610-840C-DBCAD26E0AA7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{2E39B2E1-9BBA-46EF-B83E-5D4B95D31272}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApplicationCore", "ApplicationCore", "{7B87E31D-265F-4C65-8449-0DBEF32E6633}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamPork.LiveCart.Core", "ApplicationCore\TeamPork.LiveCart.Core\TeamPork.LiveCart.Core.csproj", "{B6DF8A11-8B84-4090-AA12-15793378BDD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamPork.LiveCart.Model", "ApplicationCore\TeamPork.LiveCart.Model\TeamPork.LiveCart.Model.csproj", "{DECF1897-D6AD-4447-A976-96B7D340AFA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamPork.LiveCart.Infrastructure", "Infrastructure\TeamPork.LiveCart.Infrastructure\TeamPork.LiveCart.Infrastructure.csproj", "{F997B670-864B-43B8-9E3A-ADA7F9FD1A63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamPork.LiveCart.Infrastructure.Data", "Infrastructure\TeamPork.LiveCart.Infrastructure.Data\TeamPork.LiveCart.Infrastructure.Data.csproj", "{F226F52F-F2A4-488A-965E-F6428A68341E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14DAA416-21F3-4610-840C-DBCAD26E0AA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14DAA416-21F3-4610-840C-DBCAD26E0AA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14DAA416-21F3-4610-840C-DBCAD26E0AA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14DAA416-21F3-4610-840C-DBCAD26E0AA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6DF8A11-8B84-4090-AA12-15793378BDD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6DF8A11-8B84-4090-AA12-15793378BDD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6DF8A11-8B84-4090-AA12-15793378BDD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6DF8A11-8B84-4090-AA12-15793378BDD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DECF1897-D6AD-4447-A976-96B7D340AFA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DECF1897-D6AD-4447-A976-96B7D340AFA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DECF1897-D6AD-4447-A976-96B7D340AFA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DECF1897-D6AD-4447-A976-96B7D340AFA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F997B670-864B-43B8-9E3A-ADA7F9FD1A63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F997B670-864B-43B8-9E3A-ADA7F9FD1A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F997B670-864B-43B8-9E3A-ADA7F9FD1A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F997B670-864B-43B8-9E3A-ADA7F9FD1A63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F226F52F-F2A4-488A-965E-F6428A68341E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F226F52F-F2A4-488A-965E-F6428A68341E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F226F52F-F2A4-488A-965E-F6428A68341E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F226F52F-F2A4-488A-965E-F6428A68341E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B6DF8A11-8B84-4090-AA12-15793378BDD5} = {7B87E31D-265F-4C65-8449-0DBEF32E6633}
+		{DECF1897-D6AD-4447-A976-96B7D340AFA4} = {7B87E31D-265F-4C65-8449-0DBEF32E6633}
+		{F997B670-864B-43B8-9E3A-ADA7F9FD1A63} = {2E39B2E1-9BBA-46EF-B83E-5D4B95D31272}
+		{F226F52F-F2A4-488A-965E-F6428A68341E} = {2E39B2E1-9BBA-46EF-B83E-5D4B95D31272}
+	EndGlobalSection
+EndGlobal
