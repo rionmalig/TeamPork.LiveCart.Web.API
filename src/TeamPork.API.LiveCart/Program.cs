@@ -34,6 +34,22 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (dbContext.Database.GetPendingMigrations().Any())
+            dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        ILogger<Program> logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation(ex.Message);
+    }
+
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || true)
