@@ -7,8 +7,5 @@ using TeamPork.LiveCart.Infrastructure.Data.Entities.Abstract;
 
 namespace TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart
 {
-    public class UserRoleEntity : AuditEntity<long>
-    {
-        public ICollection<UserEntity>? Users { get; set; }
-    }
+   
 }

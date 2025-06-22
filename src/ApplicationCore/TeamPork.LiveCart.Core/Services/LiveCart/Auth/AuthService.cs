@@ -44,7 +44,6 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.Auth
                 Username = registerRequest.Username,
                 Email = registerRequest.Email,
                 PasswordHash = _hasherService.Hash(registerRequest.Password),
-                UserRoleSeqId = 1   ,
                 Active = true,
                 CreatedDate = DateOnly.FromDateTime(DateTime.UtcNow),
                 CreatedBy = 1

@@ -30,7 +30,7 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureAuthentication(builder.Configuration);
 
 builder.Services.AddAuthorization();
-// builder.Services.ConfigureOrgins(builder.Configuration); 
+builder.Services.ConfigureOrgins(builder.Configuration); 
 
 var app = builder.Build();
 

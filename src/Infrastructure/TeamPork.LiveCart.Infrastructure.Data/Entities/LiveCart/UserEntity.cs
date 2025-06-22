@@ -13,8 +13,5 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart
         public required string Username { get; set; }
         public required string Email { get; set; }
         public required string PasswordHash { get; set; }
-        public long UserRoleSeqId { get; set; }
-        [ForeignKey("UserRoleSeqId")]
-        public UserRoleEntity? UserRole { get; set; }
     }
 }

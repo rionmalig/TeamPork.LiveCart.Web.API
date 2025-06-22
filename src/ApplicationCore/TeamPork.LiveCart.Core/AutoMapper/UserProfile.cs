@@ -9,7 +9,6 @@ namespace TeamPork.LiveCart.Core.AutoMapper
         public UserProfile()
         {
             CreateMap<UserEntity, User>().ReverseMap();
-            CreateMap<UserRoleEntity, UserRole>().ReverseMap();
         }
     }
 }
