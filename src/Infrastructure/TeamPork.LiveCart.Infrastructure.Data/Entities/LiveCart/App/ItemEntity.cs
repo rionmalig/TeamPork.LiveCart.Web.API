@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.App
     {
         public required string Name { get; set; }
         public string? Code { get; set; }
+        [Precision(18, 2)]
         public decimal Price { get; set; }
         public int Quantity { get; set; }
         public float Discount { get; set; }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.App
     {
         public required DateOnly OrderedAt { get; set; }
         public required DateOnly DueAt { get; set; }
+        [Precision(18, 2)]
         public decimal Total { get; set; }
         public long CustomerId { get; set; }
         [ForeignKey("CustomerId")]

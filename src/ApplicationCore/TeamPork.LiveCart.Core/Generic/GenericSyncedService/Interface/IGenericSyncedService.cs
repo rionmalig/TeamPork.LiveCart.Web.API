@@ -10,10 +10,9 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService.Int
 {
     public interface IGenericSyncedService<TSyncedEntity, TSyncedModel> where TSyncedEntity : SyncedEntity<long> where TSyncedModel : SyncedModel<long>
     {
-        public SyncedModelChanges<TSyncedModel> Pull(DateTime lastPulled);
-        public SyncedModelChanges<TSyncedModel> PullAll();
-
-        public Task Push(SyncedModelChanges<TSyncedModel> changes, DateTime now);
+        public SyncedModelChanges<TSyncedModel> Pull(DateTime lastPulled, long userId);
+        public SyncedModelChanges<TSyncedModel> PullAll(long userId);
+        public Task Push(SyncedModelChanges<TSyncedModel> changes, DateTime now, long userId);
 
         public Task<TSyncedModel> Create(TSyncedModel model);
         public Task<TSyncedModel> Update(TSyncedModel model, TSyncedEntity entity);

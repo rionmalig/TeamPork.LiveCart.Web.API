@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TeamPork.LiveCart.Infrastructure.Data.Context.SQLContext;
 using TeamPork.LiveCart.Infrastructure.Data.Entities.Abstract;
@@ -49,33 +50,33 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService
             return mapper.Map<TSyncedModel>(entity);
         }
 
-        public SyncedModelChanges<TSyncedModel> Pull(DateTime lastPulled)
+        public SyncedModelChanges<TSyncedModel> Pull(DateTime lastPulled, long userId)
         {
 
             var modelChanges = new SyncedModelChanges<TSyncedModel>
             {
                 Created =  mapper.Map<ICollection<TSyncedModel>>(dbContext.Set<TSyncedEntity>()
-                .Where(x => x.CreatedAt > lastPulled && x.ClientId == null && x.DeletedAt == null)
+                .Where(x => x.UserSeqId == userId && x.CreatedAt > lastPulled && x.ClientId == null && x.DeletedAt == null)
                     .ToList()),
                 Updated = mapper.Map<ICollection<TSyncedModel>>(dbContext.Set<TSyncedEntity>()
-                .Where(x => x.UpdatedAt > lastPulled && x.ClientId != null && x.DeletedAt == null)
+                .Where(x => x.UserSeqId == userId && x.UpdatedAt > lastPulled && x.ClientId != null && x.DeletedAt == null)
                     .ToList()),
                 Deleted = dbContext.Set<TSyncedEntity>()
-                    .Where(x => x.DeletedAt > lastPulled && x.ClientId != null && x.ClientId != "")
+                    .Where(x => x.UserSeqId == userId && x.DeletedAt > lastPulled && x.ClientId != null && x.ClientId != "")
                     .Select(x => x.ClientId!)
                     .ToList()
             };
             return modelChanges;
         }
 
-        public SyncedModelChanges<TSyncedModel> PullAll()
+        public SyncedModelChanges<TSyncedModel> PullAll(long userId)
         {
 
             var modelChanges = new SyncedModelChanges<TSyncedModel>
             {
                 Created = mapper.Map<ICollection<TSyncedModel>>(dbContext
                 .Set<TSyncedEntity>()
-                .Where(x => x.DeletedAt == null)
+                .Where(x => x.UserSeqId == userId && x.DeletedAt == null)
                 .ToList()),
                 Updated = [],
                 Deleted = []
@@ -83,7 +84,7 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService
             return modelChanges;
         }
 
-        public async Task Push(SyncedModelChanges<TSyncedModel> changes, DateTime now)
+        public async Task Push(SyncedModelChanges<TSyncedModel> changes, DateTime now, long userId)
         {
             foreach (var model in changes.Created)
             {
@@ -92,12 +93,15 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService
                 {
                     var entity = mapper.Map<TSyncedEntity>(model);
                     entity.CreatedAt = now;
+                    entity.UserSeqId = userId;
                     dbContext.Set<TSyncedEntity>().Add(entity);
                 }
                 else
                 {
                     mapper.Map(model, existing);
                     existing.UpdatedAt = now;
+                    existing.UserSeqId = userId;
+
                 }
             }
 
@@ -113,7 +117,7 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService
 
             foreach (var id in changes.Deleted)
             {
-                var entity = await dbContext.Set<TSyncedEntity>().FindAsync(id);
+                var entity = await dbContext.Set<TSyncedEntity>().FirstAsync(entity => entity.ClientId == id);
                 if (entity != null)
                     entity.DeletedAt = now;
             }

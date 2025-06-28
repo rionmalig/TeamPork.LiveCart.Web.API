@@ -14,6 +14,7 @@ using TeamPork.LiveCart.Model.LiveCart.Sync.Response;
 using TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.App;
 using TeamPork.LiveCart.Model.Abstract;
 using TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService.Interface;
+using TeamPork.LiveCart.Model.LiveCart;
 
 namespace TeamPork.LiveCart.Core.Services.LiveCart.App
 {
@@ -42,16 +43,16 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
             this.invoiceSyncedService = invoiceSyncedService;
             this.invoiceItemSyncedService = invoiceItemSyncedService;
         }
-        public SyncPullResponse Pull(long lastPulledAt)
+        public SyncPullResponse Pull(long lastPulledAt, long userId)
         {
 
             var lastPulled = DateTimeOffset.FromUnixTimeMilliseconds(lastPulledAt).UtcDateTime;
             var changes = new ChangeSet
             {
-                Customers = customerSyncedService.Pull(lastPulled),
-                Items = itemSyncedService.Pull(lastPulled),
-                Invoices = invoiceSyncedService.Pull(lastPulled),
-                InvoiceItems = invoiceItemSyncedService.Pull(lastPulled),
+                Customers = customerSyncedService.Pull(lastPulled, userId),
+                Items = itemSyncedService.Pull(lastPulled, userId),
+                Invoices = invoiceSyncedService.Pull(lastPulled, userId),
+                InvoiceItems = invoiceItemSyncedService.Pull(lastPulled, userId),
 
             };
             return new SyncPullResponse
@@ -61,14 +62,14 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
             };
         }
 
-        public SyncPullResponse PullAll()
+        public SyncPullResponse PullAll(long userId)
         {
             var changes = new ChangeSet
             {
-                Customers = customerSyncedService.PullAll(),
-                Items = itemSyncedService.PullAll(),
-                Invoices = invoiceSyncedService.PullAll(),
-                InvoiceItems = invoiceItemSyncedService.PullAll(),
+                Customers = customerSyncedService.PullAll(userId),
+                Items = itemSyncedService.PullAll(userId),
+                Invoices = invoiceSyncedService.PullAll(userId),
+                InvoiceItems = invoiceItemSyncedService.PullAll(userId),
 
             };
             return new SyncPullResponse
@@ -78,13 +79,13 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
             };
         }
 
-        public async Task Push(SyncPushRequest request)
+        public async Task Push(SyncPushRequest request, long userId)
         {
             var changes = request.Changes;
             var now = DateTime.UtcNow;
 
-            await customerSyncedService.Push(changes.Customers, now);
-            await itemSyncedService.Push(changes.Items, now);
+            await customerSyncedService.Push(changes.Customers, now, userId);
+            await itemSyncedService.Push(changes.Items, now, userId);
             // For invoice's relationships HAVE TO BE HANDLED MANUALLY!!
             foreach(var invoice in changes.Invoices.Created)
             {
@@ -93,7 +94,7 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
                 if (customer == null) continue;
                 invoice.CustomerId = customer.Id;
             }
-            await invoiceSyncedService.Push(changes.Invoices, now);
+            await invoiceSyncedService.Push(changes.Invoices, now, userId);
 
             // For invoice item's relationships HAVE TO BE HANDLED MANUALLY!!
             foreach (var invoiceItem in changes.InvoiceItems.Created)
@@ -107,7 +108,7 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
                 invoiceItem.InvoiceId = invoice.Id;
                 invoiceItem.ItemId = item.Id;
             }
-            await invoiceItemSyncedService.Push(changes.InvoiceItems, now);
+            await invoiceItemSyncedService.Push(changes.InvoiceItems, now, userId);
         }
     }
 }

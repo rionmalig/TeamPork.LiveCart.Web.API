@@ -6,9 +6,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TeamPork.LiveCart.Core.Services.Helper.Interface;
+using TeamPork.LiveCart.Infrastructure.Data.Entities;
 using TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart;
 using TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.Auth;
 using TeamPork.LiveCart.Infrastructure.Data.Generic.Repository.Interface;
+using TeamPork.LiveCart.Model.LiveCart;
 using TeamPork.LiveCart.Model.LiveCart.Auth;
 using TeamPork.LiveCart.Model.LiveCart.Auth.Request;
 using TeamPork.LiveCart.Model.LiveCart.Auth.Response;
@@ -22,18 +24,27 @@ namespace TeamPork.LiveCart.Core.Jwt.Service
         private readonly IMapper _mapper;
         private readonly IRepository<UserEntity, long> _userRepo;
         private readonly IRepository<UserRefreshTokenEntity, long> _refreshTokenRepo;
+        private readonly IRepository<UserProfileEntity, long> _userProfileRepo;
+        private readonly IRepository<BusinessProfileEntity, long> _businessProfileRepo;
 
         public JwtService(IConfiguration configuration, 
             IPasswordHasherService passwordHasher, 
             IMapper mapper,
             IRepository<UserEntity, long> userRepo, 
-            IRepository<UserRefreshTokenEntity, long> refreshTokenRepo)
+            IRepository<UserRefreshTokenEntity, long> refreshTokenRepo,
+            IRepository<BusinessProfileEntity, long> businessprofileRepo,
+            IRepository<UserProfileEntity, long> userProfileRepo
+
+            )
         {
             _configuration = configuration;
             _passwordHasher = passwordHasher;
             _mapper = mapper;
             _userRepo = userRepo;
             _refreshTokenRepo = refreshTokenRepo;
+
+            _userProfileRepo = userProfileRepo;
+            _businessProfileRepo = businessprofileRepo;
         }
 
         public async Task<LoginResponse?> Authenticate(LoginRequest request)
@@ -54,7 +65,9 @@ namespace TeamPork.LiveCart.Core.Jwt.Service
             if (refreshToken is not null)
                 await _refreshTokenRepo.RemoveAsync(refreshToken);
 
-            return await GenerateToken(user);
+            var response = await GenerateToken(user);
+
+            return response;
         }
 
         public async Task<LoginResponse?> ValidateRefreshToken(string token)
@@ -68,7 +81,7 @@ namespace TeamPork.LiveCart.Core.Jwt.Service
             
             var user = await _userRepo.GetByIdAsync(refreshToken.UserSeqId);
             if (user is null)
-                return null;    
+                return null;
 
             return await GenerateToken(user);
         }
@@ -101,11 +114,20 @@ namespace TeamPork.LiveCart.Core.Jwt.Service
 
             var refreshToken = await GenerateRefreshToken(user.Id);
 
+            var userProfile = _mapper.Map<UserProfile>(await _userProfileRepo.GetByIdAsync(user.UserProfileSeqId ?? 0));
+            var businesProfile = _mapper.Map<BusinessProfile>(await _businessProfileRepo.GetByIdAsync(user.BusinessSeqId ?? 0));
+
             return new LoginResponse
             {
                 AccessToken = accessToken,
                 ExpiresIn = (int)tokenExpiryTimeStamp.Subtract(DateTime.UtcNow).TotalSeconds,
                 RefreshToken = refreshToken.Token,
+
+                Username = user.Username,
+                Email = user.Email,
+
+                UserProfile = userProfile,
+                BusinessProfile = businesProfile
             };
         }
         private async Task<UserRefreshToken> GenerateRefreshToken(long userId)

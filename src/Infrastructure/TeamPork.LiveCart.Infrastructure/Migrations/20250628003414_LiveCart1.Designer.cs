@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamPork.LiveCart.Infrastructure.Data.Context.SQLContext;
 
@@ -11,9 +12,11 @@ using TeamPork.LiveCart.Infrastructure.Data.Context.SQLContext;
 namespace TeamPork.LiveCart.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250628003414_LiveCart1")]
+    partial class LiveCart1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,7 +288,7 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("BusinessProfileSeqId")
+                    b.Property<long>("BusinessProfileSeqId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("OwnerSeqId")
@@ -515,7 +518,9 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                 {
                     b.HasOne("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.BusinessProfileEntity", "BusinessProfile")
                         .WithMany()
-                        .HasForeignKey("BusinessProfileSeqId");
+                        .HasForeignKey("BusinessProfileSeqId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.UserEntity", "Owner")
                         .WithOne("OwnedBusiness")

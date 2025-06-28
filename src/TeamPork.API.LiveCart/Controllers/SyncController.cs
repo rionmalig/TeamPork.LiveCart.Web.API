@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TeamPork.LiveCart.Core.Services.LiveCart.App.Interface;
 using TeamPork.LiveCart.Model.LiveCart.Sync.Request;
 using TeamPork.LiveCart.Model.LiveCart.Sync.Response;
@@ -19,19 +20,27 @@ namespace TeamPork.API.LiveCart.Controllers
             this.syncService = syncService;
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpGet("Pull")]
-        public ActionResult<SyncPullResponse> Pull([FromQuery] long lastPulledAt, [FromQuery] bool pullAll)
+        public ActionResult<SyncPullResponse> Pull([FromQuery] long lastPulledAt, [FromQuery] bool pullAll, [FromServices] ILogger<SyncController> logger)
         {
-            var response = pullAll ? syncService.PullAll() : syncService.Pull(lastPulledAt);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userIdLong = long.TryParse(userId, out var id) ? id : throw new UnauthorizedAccessException("Invalid user ID");
+
+            logger.LogInformation($"User ID: {userId}");
+            var response = pullAll ? syncService.PullAll(userIdLong) : syncService.Pull(lastPulledAt, userIdLong);
             return Ok(response);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost("Push")]
         public async Task<ActionResult> Push([FromBody] SyncPushRequest request)
         {
-            await syncService.Push(request);
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userIdLong = long.TryParse(userId, out var id) ? id : throw new UnauthorizedAccessException("Invalid user ID");
+
+            await syncService.Push(request, userIdLong);
             return Ok();
         }
     }
