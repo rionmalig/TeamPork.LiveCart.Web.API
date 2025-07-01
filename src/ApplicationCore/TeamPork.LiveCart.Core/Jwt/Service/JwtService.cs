@@ -91,6 +91,7 @@ namespace TeamPork.LiveCart.Core.Jwt.Service
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.PrimaryGroupSid, user.BusinessSeqId.ToString() ?? ""),
                 new Claim(ClaimTypes.Name, user.Username)
             };
 

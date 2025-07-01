@@ -12,8 +12,9 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Configuration
         public static void ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionStrings = configuration.GetSection("ConnectionStrings");
+
             services.AddDbContext<AppDbContext>(c =>
-                c.UseSqlServer(connectionStrings[connectionStrings["default"]!],
+                c.UseNpgsql(connectionStrings["livecart-postgre-database"],
                 x => x.MigrationsAssembly("TeamPork.LiveCart.Infrastructure")));
         }
 

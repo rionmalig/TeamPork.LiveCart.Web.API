@@ -15,10 +15,22 @@ namespace TeamPork.LiveCart.Core.AutoMapper
     {
         public SyncProfile()
         {
-            CreateMap<CustomerEntity, Customer>().ReverseMap();
-            CreateMap<ItemEntity, Item>().ReverseMap();
-            CreateMap<InvoiceEntity, Invoice>().ReverseMap();
-            CreateMap<InvoiceItemEntity, InvoiceItem>().ReverseMap();
+            CreateMap<CustomerEntity, Customer>()
+                .ForMember(dest => dest.FromBusiness,
+                    opt => opt.MapFrom(src => src.UserSeqId == null && src.BusinessSeqId != null))
+                .ReverseMap();
+            CreateMap<ItemEntity, Item>()
+                .ForMember(dest => dest.FromBusiness,
+                    opt => opt.MapFrom(src => src.UserSeqId == null && src.BusinessSeqId != null))
+                .ReverseMap(); ;
+            CreateMap<InvoiceEntity, Invoice>()
+                .ForMember(dest => dest.FromBusiness,
+                    opt => opt.MapFrom(src => src.UserSeqId == null && src.BusinessSeqId != null))
+                .ReverseMap(); ;
+            CreateMap<InvoiceItemEntity, InvoiceItem>()
+                .ForMember(dest => dest.FromBusiness,
+                    opt => opt.MapFrom(src => src.UserSeqId == null && src.BusinessSeqId != null))
+                .ReverseMap(); ;
         }
     }
 }

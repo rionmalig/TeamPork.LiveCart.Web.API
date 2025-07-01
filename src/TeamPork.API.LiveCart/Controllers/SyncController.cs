@@ -27,8 +27,10 @@ namespace TeamPork.API.LiveCart.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userIdLong = long.TryParse(userId, out var id) ? id : throw new UnauthorizedAccessException("Invalid user ID");
 
-            logger.LogInformation($"User ID: {userId}");
-            var response = pullAll ? syncService.PullAll(userIdLong) : syncService.Pull(lastPulledAt, userIdLong);
+            long? businessIdLong = long.TryParse(User.FindFirst(ClaimTypes.PrimaryGroupSid)?.Value, out var businessId) ? businessId : null;
+
+            logger.LogInformation($"Business ID: {businessIdLong}");
+            var response = pullAll ? syncService.PullAll(userIdLong, businessIdLong) : syncService.Pull(lastPulledAt, userIdLong, businessIdLong);
             return Ok(response);
         }
 
@@ -40,7 +42,9 @@ namespace TeamPork.API.LiveCart.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userIdLong = long.TryParse(userId, out var id) ? id : throw new UnauthorizedAccessException("Invalid user ID");
 
-            await syncService.Push(request, userIdLong);
+            long? businessIdLong = long.TryParse(User.FindFirst(ClaimTypes.PrimaryGroupSid)?.Value, out var businessId) ? businessId : null;
+
+            await syncService.Push(request, userIdLong, businessIdLong);
             return Ok();
         }
     }

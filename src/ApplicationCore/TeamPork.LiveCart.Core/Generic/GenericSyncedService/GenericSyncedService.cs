@@ -50,33 +50,33 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService
             return mapper.Map<TSyncedModel>(entity);
         }
 
-        public SyncedModelChanges<TSyncedModel> Pull(DateTime lastPulled, long userId)
+        public SyncedModelChanges<TSyncedModel> Pull(DateTime lastPulled, long userId, long? businessId)
         {
 
             var modelChanges = new SyncedModelChanges<TSyncedModel>
             {
                 Created =  mapper.Map<ICollection<TSyncedModel>>(dbContext.Set<TSyncedEntity>()
-                .Where(x => x.UserSeqId == userId && x.CreatedAt > lastPulled && x.ClientId == null && x.DeletedAt == null)
+                    .Where(x => (x.UserSeqId == userId || businessId.HasValue && x.BusinessSeqId == businessId) && x.CreatedAt > lastPulled && x.ClientId == null && x.DeletedAt == null)
                     .ToList()),
                 Updated = mapper.Map<ICollection<TSyncedModel>>(dbContext.Set<TSyncedEntity>()
-                .Where(x => x.UserSeqId == userId && x.UpdatedAt > lastPulled && x.ClientId != null && x.DeletedAt == null)
+                    .Where(x => (x.UserSeqId == userId || businessId.HasValue && x.BusinessSeqId == businessId) && x.UpdatedAt > lastPulled && x.ClientId != null && x.DeletedAt == null)
                     .ToList()),
                 Deleted = dbContext.Set<TSyncedEntity>()
-                    .Where(x => x.UserSeqId == userId && x.DeletedAt > lastPulled && x.ClientId != null && x.ClientId != "")
+                    .Where(x => (x.UserSeqId == userId || businessId.HasValue && x.BusinessSeqId == businessId) && x.DeletedAt > lastPulled && x.ClientId != null && x.ClientId != "")
                     .Select(x => x.ClientId!)
                     .ToList()
             };
             return modelChanges;
         }
 
-        public SyncedModelChanges<TSyncedModel> PullAll(long userId)
+        public SyncedModelChanges<TSyncedModel> PullAll(long userId, long? businessId)
         {
 
             var modelChanges = new SyncedModelChanges<TSyncedModel>
             {
                 Created = mapper.Map<ICollection<TSyncedModel>>(dbContext
                 .Set<TSyncedEntity>()
-                .Where(x => x.UserSeqId == userId && x.DeletedAt == null)
+                .Where(x => (x.UserSeqId == userId || businessId.HasValue && x.BusinessSeqId == businessId) && x.DeletedAt == null)
                 .ToList()),
                 Updated = [],
                 Deleted = []
@@ -84,7 +84,7 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService
             return modelChanges;
         }
 
-        public async Task Push(SyncedModelChanges<TSyncedModel> changes, DateTime now, long userId)
+        public async Task Push(SyncedModelChanges<TSyncedModel> changes, DateTime now, long userId, long? businessId)
         {
             foreach (var model in changes.Created)
             {
@@ -93,7 +93,8 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService
                 {
                     var entity = mapper.Map<TSyncedEntity>(model);
                     entity.CreatedAt = now;
-                    entity.UserSeqId = userId;
+                    entity.UserSeqId = !model.FromBusiness ? userId : null;
+                    entity.BusinessSeqId = model.FromBusiness && businessId.HasValue ? businessId : null;
                     dbContext.Set<TSyncedEntity>().Add(entity);
                 }
                 else
