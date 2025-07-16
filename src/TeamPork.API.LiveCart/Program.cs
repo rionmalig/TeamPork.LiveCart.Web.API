@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using TeamPork.API.LiveCart.Configuration;
@@ -29,10 +30,18 @@ builder.Services.AddCoreServices();
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureAuthentication(builder.Configuration);
 
+builder.Services.ConfigureHangfire(builder.Configuration);
+
 builder.Services.AddAuthorization();
 builder.Services.ConfigureOrgins(builder.Configuration); 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var jobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    HangfireExtension.RegisterRecurringJobs(jobManager);
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -56,7 +65,12 @@ if (app.Environment.IsDevelopment() || true)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+
+    app.UseHangfireDashboard();
 }
+
+
 
 app.UseHttpsRedirection();
 

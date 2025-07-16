@@ -8,6 +8,7 @@ using TeamPork.LiveCart.Infrastructure.Data.Entities;
 using TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart;
 using TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.App;
 using TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.Auth;
+using TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.ML;
 
 namespace TeamPork.LiveCart.Infrastructure.Data.Context.SQLContext
 {
@@ -42,5 +43,9 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Context.SQLContext
         public DbSet<ItemEntity> Items { get; set; }
         public DbSet<InvoiceEntity> Invoices { get; set; }
         public DbSet<InvoiceItemEntity> InvoiceItems { get; set; }
+
+        public DbSet<SaleForecastModelMetadataEntity> SaleForecastModelMetadatas { get; set; }
+        public DbSet<BusinessInviteCodeEntity> BusinessInviteCodes { get; set; }
+
     }
 }

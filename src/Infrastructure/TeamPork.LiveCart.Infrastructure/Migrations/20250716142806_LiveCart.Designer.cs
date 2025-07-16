@@ -12,7 +12,7 @@ using TeamPork.LiveCart.Infrastructure.Data.Context.SQLContext;
 namespace TeamPork.LiveCart.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250630103808_LiveCart")]
+    [Migration("20250716142806_LiveCart")]
     partial class LiveCart
     {
         /// <inheritdoc />
@@ -113,12 +113,20 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                     b.Property<DateOnly>("DueAt")
                         .HasColumnType("date");
 
+                    b.Property<string>("InvoiceTitle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateOnly>("OrderedAt")
                         .HasColumnType("date");
 
-                    b.Property<decimal>("Total")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("Total")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("real");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -231,9 +239,9 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Price")
+                    b.Property<float>("Price")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("real");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
@@ -304,6 +312,40 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                     b.ToTable("Businesses");
                 });
 
+            modelBuilder.Entity("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.BusinessInviteCodeEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BusinessSeqId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRedeemed")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("RedeemedByUserSeqId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessSeqId");
+
+                    b.HasIndex("RedeemedByUserSeqId");
+
+                    b.ToTable("BusinessInviteCodes");
+                });
+
             modelBuilder.Entity("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.BusinessProfileEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -329,6 +371,49 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("BusinessProfiles");
+                });
+
+            modelBuilder.Entity("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.ML.SaleForecastModelMetadataEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BusinessSeqId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastTrainedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModelPath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double?>("R2Score")
+                        .HasColumnType("double precision");
+
+                    b.Property<float?>("TotalMax")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("TotalMin")
+                        .HasColumnType("real");
+
+                    b.Property<DateOnly>("TrainingMinDate")
+                        .HasColumnType("date");
+
+                    b.Property<long?>("UserSeqId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessSeqId");
+
+                    b.HasIndex("UserSeqId");
+
+                    b.ToTable("SaleForecastModelMetadatas");
                 });
 
             modelBuilder.Entity("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.UserEntity", b =>
@@ -529,6 +614,38 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                     b.Navigation("BusinessProfile");
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.BusinessInviteCodeEntity", b =>
+                {
+                    b.HasOne("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.BusinessEntity", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessSeqId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.UserEntity", "RedeemedBy")
+                        .WithMany()
+                        .HasForeignKey("RedeemedByUserSeqId");
+
+                    b.Navigation("Business");
+
+                    b.Navigation("RedeemedBy");
+                });
+
+            modelBuilder.Entity("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.ML.SaleForecastModelMetadataEntity", b =>
+                {
+                    b.HasOne("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.BusinessEntity", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessSeqId");
+
+                    b.HasOne("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserSeqId");
+
+                    b.Navigation("Business");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.UserEntity", b =>

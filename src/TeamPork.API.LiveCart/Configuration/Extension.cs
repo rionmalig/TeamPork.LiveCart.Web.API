@@ -10,7 +10,7 @@ namespace TeamPork.API.LiveCart.Configuration
         public bool UseHttp { get; set; } = false;
     }
 
-    public static class Extension
+    public static partial class Extension
     {
         public const string PolicyAllowed = nameof(PolicyAllowed);
         public const string SectionName = "Orgins";

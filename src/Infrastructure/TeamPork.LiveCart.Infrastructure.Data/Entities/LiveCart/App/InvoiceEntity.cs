@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,10 +12,12 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.App
 {
     public class InvoiceEntity : SyncedEntity<long>
     {
+        public required string InvoiceTitle { get; set; }
         public required DateOnly OrderedAt { get; set; }
         public required DateOnly DueAt { get; set; }
         [Precision(18, 2)]
-        public decimal Total { get; set; }
+        public float Total { get; set; }
+        public required string Status { get; set; }
         public long CustomerId { get; set; }
         [ForeignKey("CustomerId")]
         public CustomerEntity? Customer { get; set; }

@@ -100,6 +100,34 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BusinessInviteCodes",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Code = table.Column<string>(type: "text", nullable: false),
+                    BusinessSeqId = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsRedeemed = table.Column<bool>(type: "boolean", nullable: false),
+                    RedeemedByUserSeqId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BusinessInviteCodes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BusinessInviteCodes_Businesses_BusinessSeqId",
+                        column: x => x.BusinessSeqId,
+                        principalTable: "Businesses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BusinessInviteCodes_Users_RedeemedByUserSeqId",
+                        column: x => x.RedeemedByUserSeqId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
                 {
@@ -142,7 +170,7 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                     ClientId = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Code = table.Column<string>(type: "text", nullable: true),
-                    Price = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Price = table.Column<float>(type: "real", precision: 18, scale: 2, nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     Discount = table.Column<float>(type: "real", nullable: false),
                     IsPercentage = table.Column<bool>(type: "boolean", nullable: false),
@@ -189,15 +217,47 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SaleForecastModelMetadatas",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserSeqId = table.Column<long>(type: "bigint", nullable: true),
+                    BusinessSeqId = table.Column<long>(type: "bigint", nullable: true),
+                    ModelPath = table.Column<string>(type: "text", nullable: false),
+                    LastTrainedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TrainingMinDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    TotalMin = table.Column<float>(type: "real", nullable: true),
+                    TotalMax = table.Column<float>(type: "real", nullable: true),
+                    R2Score = table.Column<double>(type: "double precision", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SaleForecastModelMetadatas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SaleForecastModelMetadatas_Businesses_BusinessSeqId",
+                        column: x => x.BusinessSeqId,
+                        principalTable: "Businesses",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SaleForecastModelMetadatas_Users_UserSeqId",
+                        column: x => x.UserSeqId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Invoices",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ClientId = table.Column<string>(type: "text", nullable: true),
+                    InvoiceTitle = table.Column<string>(type: "text", nullable: false),
                     OrderedAt = table.Column<DateOnly>(type: "date", nullable: false),
                     DueAt = table.Column<DateOnly>(type: "date", nullable: false),
-                    Total = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Total = table.Column<float>(type: "real", precision: 18, scale: 2, nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
                     CustomerId = table.Column<long>(type: "bigint", nullable: false),
                     CustomerClientId = table.Column<string>(type: "text", nullable: true),
                     UserSeqId = table.Column<long>(type: "bigint", nullable: true),
@@ -285,6 +345,16 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_BusinessInviteCodes_BusinessSeqId",
+                table: "BusinessInviteCodes",
+                column: "BusinessSeqId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BusinessInviteCodes_RedeemedByUserSeqId",
+                table: "BusinessInviteCodes",
+                column: "RedeemedByUserSeqId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Customers_BusinessSeqId",
                 table: "Customers",
                 column: "BusinessSeqId");
@@ -345,6 +415,16 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                 column: "UserSeqId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SaleForecastModelMetadatas_BusinessSeqId",
+                table: "SaleForecastModelMetadatas",
+                column: "BusinessSeqId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SaleForecastModelMetadatas_UserSeqId",
+                table: "SaleForecastModelMetadatas",
+                column: "UserSeqId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_BusinessSeqId",
                 table: "Users",
                 column: "BusinessSeqId");
@@ -375,10 +455,16 @@ namespace TeamPork.LiveCart.Infrastructure.Migrations
                 table: "Businesses");
 
             migrationBuilder.DropTable(
+                name: "BusinessInviteCodes");
+
+            migrationBuilder.DropTable(
                 name: "InvoiceItems");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "SaleForecastModelMetadatas");
 
             migrationBuilder.DropTable(
                 name: "Invoices");

@@ -47,12 +47,33 @@ namespace TeamPork.LiveCart.Core.Jwt.Service
             _businessProfileRepo = businessprofileRepo;
         }
 
+        public async Task<LoginResponse?> Authenticate(long userId)
+        {
+            var user = await _userRepo
+                 .GetByIdAsync( userId );
+
+            if (user is null)
+                return null;
+
+            var refreshToken = await _refreshTokenRepo
+                .AsQueryable()
+                .FirstOrDefaultAsync(x => x.UserSeqId == user.Id);
+
+            if (refreshToken is not null)
+                await _refreshTokenRepo.RemoveAsync(refreshToken);
+
+            var response = await GenerateToken(user);
+
+            return response;
+        }
+
         public async Task<LoginResponse?> Authenticate(LoginRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
                 return null;
            var user = await _userRepo
                 .AsQueryable()
+                .Include(u => u.Business)
                 .FirstOrDefaultAsync(user => user.Username == request.Username || user.Email == request.Username);
 
             if (user is null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
@@ -79,7 +100,9 @@ namespace TeamPork.LiveCart.Core.Jwt.Service
 
             await _refreshTokenRepo.RemoveAsync(refreshToken);
             
-            var user = await _userRepo.GetByIdAsync(refreshToken.UserSeqId);
+            var user = await _userRepo.AsQueryable()
+                .Include(u => u.Business)
+                .FirstOrDefaultAsync(u => u.Id == refreshToken.UserSeqId);
             if (user is null)
                 return null;
 
@@ -116,7 +139,7 @@ namespace TeamPork.LiveCart.Core.Jwt.Service
             var refreshToken = await GenerateRefreshToken(user.Id);
 
             var userProfile = _mapper.Map<UserProfile>(await _userProfileRepo.GetByIdAsync(user.UserProfileSeqId ?? 0));
-            var businesProfile = _mapper.Map<BusinessProfile>(await _businessProfileRepo.GetByIdAsync(user.BusinessSeqId ?? 0));
+            var businesProfile = _mapper.Map<BusinessProfile>(await _businessProfileRepo.GetByIdAsync(user.Business?.BusinessProfileSeqId ?? 0));
 
             return new LoginResponse
             {

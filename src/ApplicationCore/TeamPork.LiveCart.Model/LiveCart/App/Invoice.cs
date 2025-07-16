@@ -9,10 +9,12 @@ using TeamPork.LiveCart.Model.Abstract;
 namespace TeamPork.LiveCart.Model.LiveCart.App
 {
     public class Invoice : SyncedModel<long>
-    {   
+    {
+        public required string InvoiceTitle { get; set; }
         public required DateOnly OrderedAt { get; set; }
         public required DateOnly DueAt { get; set; }
-        public decimal Total { get; set; }
+        public float Total { get; set; }
+        public required string Status { get; set; }
         public long? CustomerId { get; set; }
         public string? CustomerClientId { get; set; }
     }
