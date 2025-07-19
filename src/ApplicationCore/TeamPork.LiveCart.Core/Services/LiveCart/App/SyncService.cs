@@ -26,6 +26,7 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
         private readonly IGenericSyncedService<ItemEntity, Item> itemSyncedService;
         private readonly IGenericSyncedService<InvoiceEntity, Invoice> invoiceSyncedService;
         private readonly IGenericSyncedService<InvoiceItemEntity, InvoiceItem> invoiceItemSyncedService;
+        private readonly IGenericSyncedService<InvoiceAdjustmentEntity, InvoiceAdjustment> invoiceAdjustmentSyncedService;
         private readonly ILogger<SyncService> logger;
 
         public SyncService(AppDbContext dbContext, IMapper mapper,
@@ -33,6 +34,8 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
             IGenericSyncedService<ItemEntity, Item> itemSyncedService,
             IGenericSyncedService<InvoiceEntity, Invoice> invoiceSyncedService,
             IGenericSyncedService<InvoiceItemEntity, InvoiceItem> invoiceItemSyncedService,
+            IGenericSyncedService<InvoiceAdjustmentEntity, InvoiceAdjustment> invoiceAdjustmentSyncedService,
+
             ILogger<SyncService> logger
 
             )
@@ -42,6 +45,7 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
             this.itemSyncedService = itemSyncedService;
             this.invoiceSyncedService = invoiceSyncedService;
             this.invoiceItemSyncedService = invoiceItemSyncedService;
+            this.invoiceAdjustmentSyncedService = invoiceAdjustmentSyncedService;
             this.logger = logger;
         }
         public SyncPullResponse Pull(long lastPulledAt, long userId, long? businessId)
@@ -54,6 +58,7 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
                 Items = itemSyncedService.Pull(lastPulled, userId, businessId),
                 Invoices = invoiceSyncedService.Pull(lastPulled, userId, businessId),
                 InvoiceItems = invoiceItemSyncedService.Pull(lastPulled, userId, businessId),
+                InvoiceAdjustments = invoiceAdjustmentSyncedService.Pull(lastPulled, userId, businessId)
 
             };
             return new SyncPullResponse
@@ -71,6 +76,7 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
                 Items = itemSyncedService.PullAll(userId, businessId),
                 Invoices = invoiceSyncedService.PullAll(userId, businessId),
                 InvoiceItems = invoiceItemSyncedService.PullAll(userId, businessId),
+                InvoiceAdjustments = invoiceAdjustmentSyncedService.PullAll(userId, businessId)
 
             };
             return new SyncPullResponse
@@ -141,6 +147,18 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
                 invoice.Id = invoiceEntity.Id;
             }
             await invoiceSyncedService.Push(changes.Invoices, now, userId, businessId);
+
+            // For invoice adjustment's relationships HAVE TO BE HANDLED MANUALLY!!
+            foreach (var invoiceAdjustment in changes.InvoiceAdjustments.Created)
+            {
+                var invoice = dbContext.Invoices
+                    .FirstOrDefault(invoice => invoice.ClientId == invoiceAdjustment.InvoiceClientId);
+                
+                if (invoice == null) continue;
+
+                invoiceAdjustment.InvoiceId = invoice.Id;
+            }
+            await invoiceAdjustmentSyncedService.Push(changes.InvoiceAdjustments, now, userId, businessId);
 
             // For invoice item's relationships HAVE TO BE HANDLED MANUALLY!!
             foreach (var invoiceItem in changes.InvoiceItems.Created)

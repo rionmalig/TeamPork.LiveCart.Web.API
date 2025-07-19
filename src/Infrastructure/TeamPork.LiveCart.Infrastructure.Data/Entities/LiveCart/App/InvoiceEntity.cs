@@ -22,6 +22,7 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.App
         [ForeignKey("CustomerId")]
         public CustomerEntity? Customer { get; set; }
         public string? CustomerClientId { get; set; }
+        public ICollection<InvoiceAdjustmentEntity>? InvoiceAdjustments { get; set; }
         public ICollection<InvoiceItemEntity>? InvoiceItems { get; set; }
     }
 }

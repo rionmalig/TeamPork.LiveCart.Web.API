@@ -47,5 +47,14 @@ namespace TeamPork.API.LiveCart.Controllers
             await syncService.Push(request, userIdLong, businessIdLong);
             return Ok();
         }
+
+
+        [AllowAnonymous]
+        [HttpPost("Debug-Push")]
+        public async Task<ActionResult> DebugPush([FromBody] SyncPushRequest request, [FromQuery] long userId, [FromQuery] long businessId)
+        {
+            await syncService.Push(request, userId, businessId);
+            return Ok();
+        }
     }
 }

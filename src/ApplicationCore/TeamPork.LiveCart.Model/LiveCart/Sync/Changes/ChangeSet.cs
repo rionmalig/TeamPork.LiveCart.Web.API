@@ -14,5 +14,6 @@ namespace TeamPork.LiveCart.Model.LiveCart.Sync.Changes
         public required SyncedModelChanges<Item> Items { get; set; }
         public required SyncedModelChanges<Invoice> Invoices { get; set; }
         public required SyncedModelChanges<InvoiceItem> InvoiceItems { get; set; }
+        public required SyncedModelChanges<InvoiceAdjustment> InvoiceAdjustments { get; set; }
     }
 }

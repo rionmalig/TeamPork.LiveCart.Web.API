@@ -15,6 +15,7 @@ namespace TeamPork.API.LiveCart.Configuration
             modelBuilder.EntitySet<Item>(nameof(Item));
             modelBuilder.EntitySet<InvoiceItem>(nameof(InvoiceItem));
             modelBuilder.EntitySet<Invoice>(nameof(Invoice));
+            modelBuilder.EntitySet<InvoiceAdjustment>(nameof(InvoiceAdjustment));
 
             return modelBuilder;
         }

@@ -42,6 +42,7 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Context.SQLContext
         public DbSet<CustomerEntity> Customers { get; set; }
         public DbSet<ItemEntity> Items { get; set; }
         public DbSet<InvoiceEntity> Invoices { get; set; }
+        public DbSet<InvoiceAdjustmentEntity> InvoicesAdjustments { get; set; }
         public DbSet<InvoiceItemEntity> InvoiceItems { get; set; }
 
         public DbSet<SaleForecastModelMetadataEntity> SaleForecastModelMetadatas { get; set; }
