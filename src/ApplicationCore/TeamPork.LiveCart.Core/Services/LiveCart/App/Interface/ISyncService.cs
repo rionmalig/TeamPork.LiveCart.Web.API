@@ -11,7 +11,7 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App.Interface
     public interface ISyncService
     {
         public SyncPullResponse Pull(long lastPulledAt, long userId, long? businessId);
-        public SyncPullResponse PullAll(long userId, long? businessId);
+        public SyncPullResponse PullAll(long userId, long? businessId, bool reSync);
 
         public Task Push(SyncPushRequest request, long userId, long? businessId);
     }

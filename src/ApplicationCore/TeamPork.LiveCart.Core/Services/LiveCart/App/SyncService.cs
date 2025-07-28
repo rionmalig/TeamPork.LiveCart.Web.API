@@ -1,10 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TeamPork.LiveCart.Core.Services.LiveCart.App.Interface;
 using TeamPork.LiveCart.Infrastructure.Data.Context.SQLContext;
 using TeamPork.LiveCart.Model.LiveCart.App;
@@ -12,9 +6,7 @@ using TeamPork.LiveCart.Model.LiveCart.Sync.Changes;
 using TeamPork.LiveCart.Model.LiveCart.Sync.Request;
 using TeamPork.LiveCart.Model.LiveCart.Sync.Response;
 using TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.App;
-using TeamPork.LiveCart.Model.Abstract;
 using TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService.Interface;
-using TeamPork.LiveCart.Model.LiveCart;
 using Microsoft.Extensions.Logging;
 
 namespace TeamPork.LiveCart.Core.Services.LiveCart.App
@@ -68,15 +60,15 @@ namespace TeamPork.LiveCart.Core.Services.LiveCart.App
             };
         }
 
-        public SyncPullResponse PullAll(long userId, long? businessId)
+        public SyncPullResponse PullAll(long userId, long? businessId, bool reSync)
         {
             var changes = new ChangeSet
             {
-                Customers = customerSyncedService.PullAll(userId, businessId),
-                Items = itemSyncedService.PullAll(userId, businessId),
-                Invoices = invoiceSyncedService.PullAll(userId, businessId),
-                InvoiceItems = invoiceItemSyncedService.PullAll(userId, businessId),
-                InvoiceAdjustments = invoiceAdjustmentSyncedService.PullAll(userId, businessId)
+                Customers = reSync ? customerSyncedService.PullAllResync(userId, businessId) : customerSyncedService.PullAll(userId, businessId),
+                Items = reSync ? itemSyncedService.PullAllResync(userId, businessId) : itemSyncedService.PullAll(userId, businessId),
+                Invoices = reSync ? invoiceSyncedService.PullAllResync(userId, businessId) : invoiceSyncedService.PullAll(userId, businessId),
+                InvoiceItems = reSync ? invoiceItemSyncedService.PullAllResync(userId, businessId) : invoiceItemSyncedService.PullAll(userId, businessId),
+                InvoiceAdjustments = reSync ? invoiceAdjustmentSyncedService.PullAllResync(userId, businessId) : invoiceAdjustmentSyncedService.PullAll(userId, businessId)
 
             };
             return new SyncPullResponse

@@ -22,15 +22,14 @@ namespace TeamPork.API.LiveCart.Controllers
 
         [Authorize]
         [HttpGet("Pull")]
-        public ActionResult<SyncPullResponse> Pull([FromQuery] long lastPulledAt, [FromQuery] bool pullAll, [FromServices] ILogger<SyncController> logger)
+        public ActionResult<SyncPullResponse> Pull([FromQuery] long lastPulledAt, [FromQuery] bool pullAll = false, [FromQuery] bool replacementSync = false)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userIdLong = long.TryParse(userId, out var id) ? id : throw new UnauthorizedAccessException("Invalid user ID");
 
             long? businessIdLong = long.TryParse(User.FindFirst(ClaimTypes.PrimaryGroupSid)?.Value, out var businessId) ? businessId : null;
 
-            logger.LogInformation($"Business ID: {businessIdLong}");
-            var response = pullAll ? syncService.PullAll(userIdLong, businessIdLong) : syncService.Pull(lastPulledAt, userIdLong, businessIdLong);
+            var response = pullAll ? syncService.PullAll(userIdLong, businessIdLong, replacementSync) : syncService.Pull(lastPulledAt, userIdLong, businessIdLong);
             return Ok(response);
         }
 

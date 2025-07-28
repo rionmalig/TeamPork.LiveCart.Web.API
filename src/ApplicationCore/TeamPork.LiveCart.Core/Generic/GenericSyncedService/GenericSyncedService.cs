@@ -84,6 +84,25 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService
             return modelChanges;
         }
 
+        public SyncedModelChanges<TSyncedModel> PullAllResync(long userId, long? businessId)
+        {
+
+            var modelChanges = new SyncedModelChanges<TSyncedModel>
+            {
+                Created = mapper.Map<ICollection<TSyncedModel>>(dbContext.Set<TSyncedEntity>()
+                    .Where(x => (x.UserSeqId == userId || businessId.HasValue && x.BusinessSeqId == businessId) && x.ClientId == null && x.DeletedAt == null)
+                    .ToList()),
+                Updated = mapper.Map<ICollection<TSyncedModel>>(dbContext.Set<TSyncedEntity>()
+                    .Where(x => (x.UserSeqId == userId || businessId.HasValue && x.BusinessSeqId == businessId) && x.ClientId != null && x.DeletedAt == null)
+                    .ToList()),
+                Deleted = dbContext.Set<TSyncedEntity>()
+                    .Where(x => (x.UserSeqId == userId || businessId.HasValue && x.BusinessSeqId == businessId) && x.DeletedAt != null && x.ClientId != null && x.ClientId != "")
+                    .Select(x => x.ClientId!)
+                    .ToList()
+            };
+            return modelChanges;
+        }
+
         public async Task Push(SyncedModelChanges<TSyncedModel> changes, DateTime now, long userId, long? businessId)
         {
             foreach (var model in changes.Created)

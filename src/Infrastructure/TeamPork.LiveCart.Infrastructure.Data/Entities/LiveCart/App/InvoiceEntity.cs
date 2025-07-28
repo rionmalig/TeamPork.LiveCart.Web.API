@@ -13,6 +13,7 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Entities.LiveCart.App
     public class InvoiceEntity : SyncedEntity<long>
     {
         public required string InvoiceTitle { get; set; }
+        public required string PaymentMethod { get; set; }
         public required DateOnly OrderedAt { get; set; }
         public required DateOnly DueAt { get; set; }
         [Precision(18, 2)]

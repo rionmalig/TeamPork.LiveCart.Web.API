@@ -12,6 +12,8 @@ namespace TeamPork.LiveCart.Infrastructure.Data.Generic.GenericSyncedService.Int
     {
         public SyncedModelChanges<TSyncedModel> Pull(DateTime lastPulled, long userId, long? businessId);
         public SyncedModelChanges<TSyncedModel> PullAll(long userId, long? businessId);
+        public SyncedModelChanges<TSyncedModel> PullAllResync(long userId, long? businessId);
+
         public Task Push(SyncedModelChanges<TSyncedModel> changes, DateTime now, long userId, long? businessId);
 
         public Task<TSyncedModel> Create(TSyncedModel model);

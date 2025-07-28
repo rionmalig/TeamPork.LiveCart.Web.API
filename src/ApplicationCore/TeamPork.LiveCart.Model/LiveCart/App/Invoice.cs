@@ -11,6 +11,7 @@ namespace TeamPork.LiveCart.Model.LiveCart.App
     public class Invoice : SyncedModel<long>
     {
         public required string InvoiceTitle { get; set; }
+        public required string PaymentMethod { get; set; }
         public required DateOnly OrderedAt { get; set; }
         public required DateOnly DueAt { get; set; }
         public float Total { get; set; }
